@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="www.study.com.orm.bulletinBoard.mapper.BoardMapper">
+
+    <resultMap id="bulletinBoardTypeResult" type="www.study.com.orm.bulletinBoard.model.BulletinBoardTypeVO">
+        <id property="boardTypeId" column="id"/>
+        <result property="boardType" column="name"/>
+    </resultMap>
+
+    <resultMap id="postResult" type="www.study.com.orm.bulletinBoard.model.PostVO" extends="bulletinBoardResult">
+        <result property="boardTitle" column="board_title"/>
+        <association property="boardType" columnPrefix="bt_" resultMap="bulletinBoardTypeResult"/>
+    </resultMap>
+
+
+    <resultMap id="bulletinBoardResult" type="www.study.com.orm.bulletinBoard.model.BulletinBoardVO">
+        <id property="hierarchicallyId" column="hierarchically_id" javaType="java.lang.String"/>
+        <result property="content" column="content"/>
+        
+        <association property="writer" resultMap="www.study.com.orm.party.mapper.PartyMapper.partyResult"/>
+        <discriminator javaType="java.lang.String" column="post_type">
+            <case value="POST" resultMap="postResult"/>
+        </discriminator>
+    </resultMap>
+
+    <select id="getAll" resultMap="bulletinBoardResult">
+        select CP.*, cbbp.*,CBBT.ID as bt_id,CBBT.NAME as bt_name
+        from c_bulletin_board_post cbbp
+                 left outer join C_PARTY CP on cbbp.writer_id = CP.ID
+                 left outer join C_BULLETIN_BOARD_TYPE CBBT on cbbp.BOARD_ID = CBBT.ID
+        where POST_TYPE = 'POST'
+    </select>
+
+    <select id="getAllReply" resultMap="bulletinBoardResult">
+        select c.*, cbbp.*, CBBT.id as bt_id, CBBT.name bt_name from c_bulletin_board_post cbbp
+                          left join C_PARTY  c on cbbp.WRITER_ID = c.ID
+                          left outer join C_BULLETIN_BOARD_TYPE CBBT on cbbp.BOARD_ID = CBBT.ID
+                                where hierarchically_id like  #{hierarchicallyId}||'%'
+    </select>
+    
+    <select id="getOnePost" resultMap="bulletinBoardResult">
+        select c.*, cbbp.*, cbbt.id as bt_id, cbbt.name as bt_name from c_bulletin_board_post cbbp
+                left join C_PARTY c on cbbp.writer_id = c.ID
+                left outer join c_bulletin_board_type cbbt on cbbp.board_id = cbbt.id
+                        where hierarchically_id like #{hierarchicallyId}
+    </select>
+    
+    <insert id="insertPost" >
+        <selectKey keyProperty="hierarchicallyId" order="BEFORE" resultType="String" >
+            select TO62(SEQ_POST.nextval) from dual
+        </selectKey>
+        insert into c_bulletin_board_post
+            (hierarchically_id, writer_id, content, post_type, board_id, board_title) VALUES
+                 (#{hierarchicallyId},#{writer.id}, #{content},'POST',#{boardType.boardTypeId},#{boardTitle})
+    </insert>
+
+    <insert id="insertReply">
+       <selectKey keyProperty="hierarchicallyId" order="BEFORE" resultType="String">
+           select #{hierarchicallyId}||#{HID}||seq_post.nextval from dual
+       </selectKey>
+        insert into c_bulletin_board_post
+            (hierarchically_id, writer_id, content, post_type) VALUES
+                (#{hierarchicallyId},${writer.id},#{content},'REPLY')
+    </insert>
+
+    <update id="updatePost" >
+        update c_bulletin_board_post set content = #{content} ,board_title = #{boardTitle}
+            WHERE hierarchically_id = #{hierarchicallyId}
+    </update>
+
+</mapper>

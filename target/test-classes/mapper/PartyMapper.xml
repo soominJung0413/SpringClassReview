@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="www.study.com.orm.party.mapper.PartyMapper">
+
+    <resultMap id="partyResult" type="www.study.com.orm.party.model.PartyVO">
+        <result property="id" column="id"  />
+        <result property="name" column="name" />
+        <result property="birthDate" column="birth_date" />
+        <result property="partyType" column="party_type" />
+
+        <collection property="contextPointList" ofType="www.study.com.orm.party.model.ContactPointVO">
+            <result property="typeName" column="type_name"/>
+            <result property="typeValue" column="type_value"/>
+        </collection>
+
+        <collection property="contextPointList" resultMap="hashTagResultMap" columnPrefix="htl_"/>
+
+        <discriminator javaType="java.lang.String" column="party_type">
+            <case value="PERSON" resultMap="personResult"/>
+            <case value="ORGANIZATION" resultMap="organizationResult"/>
+        </discriminator>
+    </resultMap>
+
+    <resultMap id="personResult" type="www.study.com.orm.party.model.PersonVO" extends="partyResult">
+        <result property="gender" column="gender"/>
+    </resultMap>
+
+    <resultMap id="organizationResult" type="www.study.com.orm.party.model.OrganizationVO" extends="partyResult">
+        <result property="salesTot" column="sales_Total"/>
+    </resultMap>
+
+    <resultMap id="contactPointResult" type="www.study.com.orm.party.model.ContactPointVO">
+        <result property="typeName" column="type_name"/>
+        <result property="typeValue" column="type_value"/>
+    </resultMap>
+
+    <resultMap id="hashTagResultMap" type="www.study.com.orm.party.model.HashTagVO">
+        <id column="id" property="id"/>
+        <result column="tagName" property="tagName"/>
+    </resultMap>
+
+    <select id="getAll" resultMap="partyResult">
+        select * from C_PARTY
+    </select>
+
+    <select id="getAllWithContactPoint" resultMap="partyResult">
+        select * from C_PARTY p LEFT outer JOIN c_contact_point cp on p.id = cp.id
+    </select>
+
+    <select id="getAllWithContactPointWithHashTag" resultMap="partyResult">
+        select p.*,ccp.*,chs.*,cht.id as htl_id, cht.tagName as htl_tagName from c_party p
+                 left outer join c_contact_point ccp on p.id = ccp.id
+                 left outer join c_hash_service chs on p.id = chs.party_id
+                 left outer join c_hash_tag cht on chs.hash_id = cht.id
+    </select>
+</mapper>
