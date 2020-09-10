@@ -15,7 +15,7 @@ import www.study.com.orm.party.model.PartyVO;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("file:C:\\Users\\doli0\\Desktop\\Springclass\\mybatisStudy\\web\\WEB-INF\\applicationContext.xml")
+@ContextConfiguration("file:C:\\Users\\doli0\\Desktop\\Springclass\\mybatisStudyReview\\web\\WEB-INF\\applicationContext.xml")
 @Log4j
 public class mapperTests {
 

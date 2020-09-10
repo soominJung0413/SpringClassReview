@@ -31,6 +31,10 @@
 
                 <button id="btnModifyPost" class="btn btn-default" data-hierarchy_id=${post.hierarchicallyId}>수정</button>
                 <button data-oper='list' class="btn btn-default">글 목록</button>
+                    <form id="modifyPostPageNumForm" role="form" action="/board/list" method="get">
+                        <input type="hidden" name='pageNum' value='${cri.pageNum}'>
+                        <input type="hidden" name='amount' value='${cri.amount}'>
+                    </form>
             </div>
             <!-- /.panel -->
         </div>
@@ -50,11 +54,16 @@
         setOperMode("readMode");
 
         $("#btnModifyPost").on('click', function(e){
-            self.location = "/board/modify?hierarchicallyId=" + $(this).data('hierarchy_id');
+            var hierarchicallyId = $(this).data("hierarchy_id");
+            console.log(hierarchicallyId);
+            var modifyPostPageNumForm = $("#modifyPostPageNumForm");
+            modifyPostPageNumForm.attr("action","/board/modify");
+            modifyPostPageNumForm.append("<input type='hidden' name='hierarchicallyId' value='"+hierarchicallyId+"'>");
+            modifyPostPageNumForm.submit();
         });
 
         $("button[data-oper='list']").on("click", function(e) {
-            self.location = "/board/list";
+            $("#modifyPostPageNumForm").submit();
         });
     });
 </script>

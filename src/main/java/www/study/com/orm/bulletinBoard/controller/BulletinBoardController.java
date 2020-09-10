@@ -1,12 +1,13 @@
 package www.study.com.orm.bulletinBoard.controller;
 
+import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import www.study.com.framework.Criteria;
+import www.study.com.framework.util.PagingCriteriaGeneric;
 import www.study.com.orm.bulletinBoard.model.BulletinBoardVO;
 import www.study.com.orm.bulletinBoard.model.PostVO;
 import www.study.com.orm.bulletinBoard.service.BulletinBoardService;
@@ -21,45 +22,63 @@ public class BulletinBoardController {
     private BulletinBoardService bulletinBoardService;
 
     @GetMapping("list")
-    public void provideBoardList(Model model){
-        List<BulletinBoardVO> list = bulletinBoardService.readAll();
-        model.addAttribute("list",list);
+    public void provideBoardList(Criteria criteria, Model model){
+        PagingCriteriaGeneric<List<BulletinBoardVO>,Integer> pagingCriteriaGeneric = bulletinBoardService.readAllWithPaging(criteria);
+
+        model.addAttribute("list",pagingCriteriaGeneric.getAllWithPaging());
+        model.addAttribute("pageMaker", new Criteria(criteria.getPageNum(),criteria.getAmount(),pagingCriteriaGeneric.getTotalCount()));
     }
 
     @GetMapping("/readOnePost")
-    public String provideReadForm(String hierarchicallyId, Model model){
+    public String provideReadForm(@ModelAttribute("cri")Criteria criteria, String hierarchicallyId, Model model){
         BulletinBoardVO bulletinBoardVO = bulletinBoardService.readOnePost(hierarchicallyId);
         model.addAttribute("post",bulletinBoardVO);
         return "board/PostDetail";
     }
 
     @GetMapping("/register")
-    public void provideRegisterForm(){}
+    public void provideRegisterForm(@ModelAttribute("cri")Criteria criteria){}
 
-    @PostMapping("register")
-    public String processRegisterForm(PostVO postVO, RedirectAttributes redirectAttributes){
+    @PostMapping("/register")
+    public String processRegisterForm(@ModelAttribute("cri")Criteria criteria, PostVO postVO, RedirectAttributes redirectAttributes){
         int result = bulletinBoardService.registerPost(postVO);
         if(result != 1){
         }
         String resultStr = postVO.getHierarchicallyId()+"번 게시물이 등록되었습니다.";
         redirectAttributes.addFlashAttribute("result",resultStr);
+        redirectAttributes.addAttribute("amount",criteria.getAmount());
+        redirectAttributes.addAttribute("pageNum",criteria.getPageNum());
         return "redirect:/board/list";
     }
 
     @GetMapping("/modify")
-    public String provideModifyForm(String hierarchicallyId, Model model){
+    public String provideModifyForm(@ModelAttribute("cri")Criteria criteria, String hierarchicallyId, Model model){
         BulletinBoardVO bulletinBoardVO =bulletinBoardService.readOnePost(hierarchicallyId);
         model.addAttribute("post",bulletinBoardVO);
         return "board/modifyPost";
     }
 
     @PostMapping("/modify")
-    public String processModifyForm(PostVO postVO, RedirectAttributes redirectAttributes){
+    public String processModifyForm(@ModelAttribute("cri")Criteria criteria, PostVO postVO, RedirectAttributes redirectAttributes){
         int result = bulletinBoardService.modifyPost(postVO);
         if(result != 1){
         }
         String resultStr = postVO.getHierarchicallyId()+"번 게시물이 수정되었습니다.";
         redirectAttributes.addFlashAttribute("result",resultStr);
+        redirectAttributes.addAttribute("amount",criteria.getAmount());
+        redirectAttributes.addAttribute("pageNum",criteria.getPageNum());
+        return "redirect:/board/list";
+    }
+
+    @PostMapping("/remove")
+    public String processRemove(@ModelAttribute("cri")Criteria criteria, @RequestParam("hierarchicallyId") String hierarchicallyId, RedirectAttributes redirectAttributes){
+        int result = bulletinBoardService.removePost(hierarchicallyId);
+        if(result != 1){}
+
+        String resultStr = hierarchicallyId+"번 게시물이 삭제되었습니다.";
+        redirectAttributes.addFlashAttribute("result",resultStr);
+        redirectAttributes.addAttribute("amount",criteria.getAmount());
+        redirectAttributes.addAttribute("pageNum",criteria.getPageNum());
         return "redirect:/board/list";
     }
 

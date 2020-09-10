@@ -35,7 +35,11 @@
                     <%@ include file="./includes/PageInfo.jsp"%>
 
                     <button type="submit" id='btnModify' class="btn btn-default">글 수정</button>
+                    <button type="submit" id='btnRemove' class="btn btn-warning">글 삭제</button>
                     <button type="submit" id='btnList' class="btn btn-info">글 목록</button>
+
+                    <input type="hidden" name='pageNum' value='${cri.pageNum}'>
+                    <input type="hidden" name='amount' value='${cri.amount}'>
                 </form>
             </div>
             <!-- /.panel -->
@@ -61,9 +65,24 @@
         $('#btnList').on("click", function(e) {
             e.preventDefault();
 
+            var pageNumInput = $("input:hidden[name='pageNum']").clone();
+            var amountInput = $("input:hidden[name='amount']").clone();
+
             formObj.attr('action', "/board/list").attr("method", "get");
+            formObj.empty();
+            formObj.append(pageNumInput);
+            formObj.append(amountInput);
 
             formObj.submit();
         });
+
+        $('#btnRemove').on("click", function(e) {
+            e.preventDefault();
+
+            formObj.attr('action', "/board/remove").attr("method", "post");
+
+            formObj.submit();
+        });
+
     });
 </script>

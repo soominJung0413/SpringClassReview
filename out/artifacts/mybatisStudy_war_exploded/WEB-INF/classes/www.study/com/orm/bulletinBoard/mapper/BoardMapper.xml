@@ -33,6 +33,21 @@
         where POST_TYPE = 'POST'
     </select>
 
+    <select id="getAllWithPaging" resultMap="bulletinBoardResult">
+    <![CDATA[
+        select cbbp.*,c.* from
+            (select rownum rn, cbbp.*
+             from c_bulletin_board_post cbbp
+             where ROWNUM <= #{criteria.pageNum} * #{criteria.amount} and POST_TYPE = 'POST') cbbp
+                left outer join C_PARTY c on cbbp.writer_id = c.ID
+        where rn > (#{criteria.pageNum} - 1) * #{criteria.amount}
+    ]]>
+    </select>
+
+    <select id="getPostTotalCount" resultType="java.lang.Integer">
+        select count(*) from C_BULLETIN_BOARD_POST where POST_TYPE = 'POST'
+    </select>
+
     <select id="getAllReply" resultMap="bulletinBoardResult">
         select c.*, cbbp.*, CBBT.id as bt_id, CBBT.name bt_name from c_bulletin_board_post cbbp
                           left join C_PARTY  c on cbbp.WRITER_ID = c.ID
@@ -69,5 +84,9 @@
         update c_bulletin_board_post set content = #{content} ,board_title = #{boardTitle}
             WHERE hierarchically_id = #{hierarchicallyId}
     </update>
+
+    <delete id="deletePost">
+        delete C_BULLETIN_BOARD_POST where HIERARCHICALLY_ID = #{hierarchicallyId}
+    </delete>
 
 </mapper>

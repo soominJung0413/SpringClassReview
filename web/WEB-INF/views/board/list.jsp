@@ -42,12 +42,40 @@
                     <tbody>
                     <c:forEach items="${list}" var="post">
                         <tr>
-                            <td><a href="/board/readOnePost?hierarchicallyId=${post.hierarchicallyId}">${post.boardTitle}</a></td>
+                            <td><a class="movePostDetail" href="${post.hierarchicallyId}">${post.boardTitle}</a></td>
                             <td>${post.writer.name}</td>
                         </tr>
                     </c:forEach>
                     </tbody>
                 </table>
+                    <div class=''> <!-- Page Jump 용 anchor -->
+                        <ul class='pagination'>
+                            <c:if test="${pageMaker.prev}">
+                                <li class="paginate_button previous">
+                                    <a href="${pageMaker.startPageNum - 1}">Previous</a>
+                                </li>
+                            </c:if>
+
+                            <c:forEach var="num" begin="${pageMaker.startPageNum}" end="${pageMaker.endPageNum}">
+                                <!-- active : 현재 선택된 것 지정. 더이상 클릭하지 않아도 됩니다. -->
+                                <li class="paginate_button ${pageMaker.pageNum == num ? "active":"" }">
+                                    <a href="${num}">${num}</a>
+                                </li>
+                            </c:forEach>
+
+                            <c:if test="${pageMaker.next}">
+                                <li class="paginate_button next">
+                                    <a href="${pageMaker.endPageNum + 1}">Next</a>
+                                </li>
+                            </c:if>
+                        </ul>
+                        <!-- pagination 처리 시에는 검색 조건에 대한 변화가 없어야합니다. 이에 기억하고 있다가 재요청하는 스타일로 개발합니다.
+                                검색 이후 검색 문자열 변경하고 페이지를 누른다면 검색 문자열 변경 이전으로 지속되어야 합니다. -->
+                        <form id='actionForm' action='/board/list' method='get'>
+                            <input type="hidden" name='pageNum' value='${pageMaker.pageNum}'>
+                            <input type="hidden" name='amount' value='${pageMaker.amount}'>
+                        </form>
+                    </div> <!-- Page Jump 용 anchor -->
             </div>
         </div>
     </div>
@@ -82,6 +110,7 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+        var actionForm = $("#actionForm");
         var result = '<c:out value="${result}"/>';
 
         checkModal(result);
@@ -99,7 +128,24 @@
         }
 
         $("#btnInsertPostPage").on('click', function(e){
-            self.location = "/board/register";
+            actionForm.attr("action","/board/register");
+            actionForm.submit();
+        });
+
+        $(".pagination a").on("click",function(e){
+            e.preventDefault();
+            var pageNum = $(this).attr("href");
+            var pageNumInput = $("input:hidden[name='pageNum']");
+            pageNumInput.val(pageNum);
+            actionForm.submit();
+        });
+
+        $(".movePostDetail").on("click",function(e){
+            e.preventDefault();
+            var hierarchicallyId = $(this).attr("href");
+            actionForm.attr("action","/board/readOnePost");
+            actionForm.append(" <input type='hidden' name='hierarchicallyId' value='"+hierarchicallyId+"'>");
+            actionForm.submit();
         });
 
     });

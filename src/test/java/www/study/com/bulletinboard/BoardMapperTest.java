@@ -7,17 +7,17 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import www.study.com.framework.Criteria;
 import www.study.com.orm.bulletinBoard.mapper.BoardMapper;
 import www.study.com.orm.bulletinBoard.model.BulletinBoardTypeVO;
 import www.study.com.orm.bulletinBoard.model.BulletinBoardVO;
 import www.study.com.orm.bulletinBoard.model.PostVO;
 import www.study.com.orm.party.model.PartyVO;
-
 import java.util.Arrays;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("file:C:\\Users\\doli0\\Desktop\\Springclass\\mybatisStudy\\web\\WEB-INF\\applicationContext.xml")
+@ContextConfiguration("file:C:\\Users\\doli0\\Desktop\\Springclass\\mybatisStudyReview\\web\\WEB-INF\\applicationContext.xml")
 @Log4j
 public class BoardMapperTest {
 
@@ -108,4 +108,20 @@ public class BoardMapperTest {
 
         int result = boardMapper.updatePost(postVO);
     }
+
+//    @Test
+    public void testDeletePost(){
+//        Arrays.stream(new String[]{"V-2","1-5","1-6","2-7","V-34"}).forEach(s -> boardMapper.deletePost(s));
+        boardMapper.deletePost("V-32");
+    }
+
+    @Test
+    public void testGetAllWithPaging(){
+        Criteria criteria = new Criteria();
+        List<BulletinBoardVO> list = boardMapper.getAllWithPaging(criteria);
+        for (BulletinBoardVO vo : list) {
+            log.info(vo);
+        }
+        }
+
 }
