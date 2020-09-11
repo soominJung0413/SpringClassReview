@@ -33,12 +33,34 @@
         where POST_TYPE = 'POST'
     </select>
 
+    <!--검색시 추가할 sql  and (cbbp.board_title like '%테스트%') -->
+    <sql id="criteria" >
+        <trim prefix=" and (" suffix=")" prefixOverrides="or">
+                <foreach collection="criteria.searchTypeArr" item="searchType" separator=" " >
+                    <trim prefix="or">
+                    <choose>
+                        <when test="searchType == 'T'.toString()" >
+                            board_title like '%'||#{criteria.searchKeyword}||'%'
+                        </when>
+                        <when test="searchType == 'C'.toString()" >
+                            content like '%'||#{criteria.searchKeyword}||'%'
+                        </when>
+                    </choose>
+                    </trim>
+                </foreach>
+            </trim>
+    </sql>
+
     <select id="getAllWithPaging" resultMap="bulletinBoardResult">
     <![CDATA[
         select cbbp.*,c.* from
             (select rownum rn, cbbp.*
              from c_bulletin_board_post cbbp
-             where ROWNUM <= #{criteria.pageNum} * #{criteria.amount} and POST_TYPE = 'POST') cbbp
+             where ROWNUM <= #{criteria.pageNum} * #{criteria.amount} and POST_TYPE = 'POST'
+    ]]>
+            <include refid="criteria"/>
+     <![CDATA[
+                ) cbbp
                 left outer join C_PARTY c on cbbp.writer_id = c.ID
         where rn > (#{criteria.pageNum} - 1) * #{criteria.amount}
     ]]>
@@ -46,6 +68,7 @@
 
     <select id="getPostTotalCount" resultType="java.lang.Integer">
         select count(*) from C_BULLETIN_BOARD_POST where POST_TYPE = 'POST'
+        <include refid="criteria"/>
     </select>
 
     <select id="getAllReply" resultMap="bulletinBoardResult">

@@ -1,13 +1,14 @@
 package www.study.com.framework;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 public class Criteria {
 
     private static final int PageNumberAmount = 10;
 
-    private int pageNum, amount;
+    protected int pageNum, amount;
 
     private int startPageNum, endPageNum, realEndPageNum;
 
@@ -22,13 +23,14 @@ public class Criteria {
         this.amount = amount;
     }
 
-    public Criteria(int pageNum, int amount,int total) {// 데이터베이스 값에 따른 리스트를 위한 생성자
-        this.pageNum = pageNum;
-        this.amount = amount;
+    public Criteria(Criteria criteria,int total) {//
+       this(criteria.getPageNum(),criteria.getAmount());
         this.calcPagination(total);
     }
 
-    private void calcPagination(int total){
+
+
+    protected void calcPagination(int total){
 
         endPageNum = pageNum + (int)(PageNumberAmount * 0.1 / 2 - 1 ); //
 

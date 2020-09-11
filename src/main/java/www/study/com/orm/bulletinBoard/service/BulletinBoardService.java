@@ -19,12 +19,13 @@ public class BulletinBoardService {
     public List<BulletinBoardVO> readAll(){
         return boardMapper.getAll();
     };
+
     public PagingCriteriaGeneric<List<BulletinBoardVO>,Integer> readAllWithPaging(Criteria criteria){
-        return new PagingCriteriaGeneric<List<BulletinBoardVO>,Integer>(boardMapper.getAllWithPaging(criteria),boardMapper.getPostTotalCount());
+        return new PagingCriteriaGeneric<List<BulletinBoardVO>,Integer>(boardMapper.getAllWithPaging(criteria),boardMapper.getPostTotalCount(criteria));
     };
 
-    public int getPostTotalCount(){
-        return  boardMapper.getPostTotalCount();
+    public int getPostTotalCount(Criteria criteria){
+        return  boardMapper.getPostTotalCount(criteria);
     };
 
     public List<BulletinBoardVO> readAllReply(String hierarchicallyId){

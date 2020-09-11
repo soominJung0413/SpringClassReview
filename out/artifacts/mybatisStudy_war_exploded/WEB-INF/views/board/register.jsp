@@ -35,6 +35,9 @@
                     <button id = "btnInsertPost" type="submit" class="btn btn-default">Submit Button</button>
                     <button type="reset" class="btn btn-default">Reset Button</button>
 
+                    <input type="hidden" name='pageNum' value='${cri.pageNum}'>
+                    <input type="hidden" name='amount' value='${cri.amount}'>
+
                     <input type="hidden" name="boardType.boardTypeId" value="-1"><%--게시판 종류--%>
                     <input type="hidden" name="writer.id" value="-100"><%--세션유저아이디--%>
                 </form>

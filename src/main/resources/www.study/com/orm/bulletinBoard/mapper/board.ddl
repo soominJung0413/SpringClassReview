@@ -107,7 +107,17 @@ select TO62(seq_post.nextval) from dual;
 select cbbp.* from
     (select rownum rn, cbbp.*
      from c_bulletin_board_post cbbp
-     where ROWNUM <=20 and POST_TYPE = 'POST') cbbp
+     where ROWNUM <=20  and POST_TYPE = 'POST' ) cbbp
     left outer join C_PARTY c on cbbp.writer_id = c.ID
  where rn > 10;
+
+--리스트를 가져오는 쿼리에서 단순 검색 기능을 처리하려면 어떻게 해야할까.
+select cbbp.* from
+    (select rownum rn, cbbp.*
+     from c_bulletin_board_post cbbp
+     where ROWNUM <=20 and (cbbp.board_title like '%테스트%') and POST_TYPE = 'POST' ) cbbp
+        left outer join C_PARTY c on cbbp.writer_id = c.ID
+where rn > 10;
+
+
 

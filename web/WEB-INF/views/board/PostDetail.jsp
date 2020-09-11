@@ -32,8 +32,7 @@
                 <button id="btnModifyPost" class="btn btn-default" data-hierarchy_id=${post.hierarchicallyId}>수정</button>
                 <button data-oper='list' class="btn btn-default">글 목록</button>
                     <form id="modifyPostPageNumForm" role="form" action="/board/list" method="get">
-                        <input type="hidden" name='pageNum' value='${cri.pageNum}'>
-                        <input type="hidden" name='amount' value='${cri.amount}'>
+                        ${cri.makeHTMLTags()}
                     </form>
             </div>
             <!-- /.panel -->

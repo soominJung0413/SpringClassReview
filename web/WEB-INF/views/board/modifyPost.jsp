@@ -37,9 +37,7 @@
                     <button type="submit" id='btnModify' class="btn btn-default">글 수정</button>
                     <button type="submit" id='btnRemove' class="btn btn-warning">글 삭제</button>
                     <button type="submit" id='btnList' class="btn btn-info">글 목록</button>
-
-                    <input type="hidden" name='pageNum' value='${cri.pageNum}'>
-                    <input type="hidden" name='amount' value='${cri.amount}'>
+                        ${cri.makeHTMLTags()}
                 </form>
             </div>
             <!-- /.panel -->
@@ -55,11 +53,11 @@
         // ./includes/PostInfo.jsp에 정의된 함수입니다.
         setOperMode("updateMode");
 
-        var formObj = $("#postInfoForm");
+        var searchKeywordFrom = $("#postInfoForm");
 
         $('#btnModify').on("click", function(e) {
             e.preventDefault();
-            formObj.submit();
+            searchKeywordFrom.submit();
         });
 
         $('#btnList').on("click", function(e) {
@@ -67,21 +65,25 @@
 
             var pageNumInput = $("input:hidden[name='pageNum']").clone();
             var amountInput = $("input:hidden[name='amount']").clone();
+            var searchTypeInput = $("input:hidden[name='searchType']").clone();
+            var searchKeywordInput = $("input:hidden[name='searchKeyword']").clone();
 
-            formObj.attr('action', "/board/list").attr("method", "get");
-            formObj.empty();
-            formObj.append(pageNumInput);
-            formObj.append(amountInput);
+            searchKeywordFrom.attr('action', "/board/list").attr("method", "get");
+            searchKeywordFrom.empty();
+            searchKeywordFrom.append(pageNumInput);
+            searchKeywordFrom.append(amountInput);
+            searchKeywordFrom.append(searchTypeInput);
+            searchKeywordFrom.append(searchKeywordInput);
 
-            formObj.submit();
+            searchKeywordFrom.submit();
         });
 
         $('#btnRemove').on("click", function(e) {
             e.preventDefault();
 
-            formObj.attr('action', "/board/remove").attr("method", "post");
+            searchKeywordFrom.attr('action', "/board/remove").attr("method", "post");
 
-            formObj.submit();
+            searchKeywordFrom.submit();
         });
 
     });

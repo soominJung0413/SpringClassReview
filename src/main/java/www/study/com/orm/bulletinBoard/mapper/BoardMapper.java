@@ -13,7 +13,7 @@ public interface BoardMapper {
 
     public List<BulletinBoardVO> getAllWithPaging(@Param("criteria") Criteria criteria);
 
-    public int getPostTotalCount();
+    public int getPostTotalCount(@Param("criteria") Criteria criteria);
 
     public List<BulletinBoardVO> getAllReply(@Param("hierarchicallyId") String hierarchicallyId);
 
